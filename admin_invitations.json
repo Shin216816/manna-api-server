@@ -1,0 +1,28 @@
+{
+  "invitations": [
+    {
+      "id": 1,
+      "email": "daniel.l.wang08@gmail.com",
+      "name": "Daniel",
+      "invitation_code": "INVITE_97E966C7CEF9",
+      "created_at": "2025-09-20T04:08:24.594821+00:00",
+      "expires_at": "2025-09-21T04:08:24.594810+00:00",
+      "is_used": true,
+      "used_at": "2025-09-20T04:09:29.055963+00:00",
+      "created_by": "macho",
+      "used_by": "daniel.l.wang08@gmail.com"
+    },
+    {
+      "id": 2,
+      "email": "doingcode333@outlook.com",
+      "name": "Frank Ting",
+      "invitation_code": "INVITE_05D9083E1E93",
+      "created_at": "2025-10-02T19:18:19.900066+00:00",
+      "expires_at": "2025-10-03T19:18:19.900053+00:00",
+      "is_used": true,
+      "used_at": "2025-10-02T19:19:32.247644+00:00",
+      "created_by": "macho",
+      "used_by": "doingcode333@outlook.com"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+.env
+.env.production
+.venv
+.pytest_cache
+alembic
+generate_fernet_key.pytest_cache
+table_upload.cmd
+test.db
+test_manna.db
+cors_test.html
+pytest.ini
+run.cmd
+uploads
+generate_admin_invitation.py
+nul
+

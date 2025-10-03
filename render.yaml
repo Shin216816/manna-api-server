@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: manna-api-server
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: ENVIRONMENT
+        value: production
+      - key: MODE
+        value: production
+      - key: DEBUG
+        value: false
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_TgLY39iUtQvS@ep-cool-darkness-adq0ws3x-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FERNET_SECRET
+        generateValue: true
+      - key: BASE_URL
+        value: https://manna-api-server.onrender.com/
+      - key: ADMIN_FRONTEND_URL
+        value: https://manna-church-admin.netlify.app
+      - key: CORS_ORIGINS
+        value: '["https://manna-church-admin.netlify.app", "https://manna-api-server.onrender.com", "http://localhost:3000", "http://localhost:8080", "*"]'
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLIC_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PLAID_CLIENT_ID
+        sync: false
+      - key: PLAID_SECRET
+        sync: false
+      - key: PLAID_ENV
+        value: production
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://manna-api-server.onrender.com/api/v1/auth/google/redirect
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: manna-uploads
+      mountPath: /uploads
+      sizeGB: 1

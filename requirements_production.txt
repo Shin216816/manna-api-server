@@ -1,0 +1,220 @@
+# Production Requirements for Manna Platform
+
+# Core FastAPI and dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography==41.0.8
+
+# Redis for caching and rate limiting
+redis==5.0.1
+hiredis==2.2.3
+
+# Monitoring & Observability
+psutil==5.9.6
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Email & Notifications
+sendgrid==6.10.0
+twilio==8.10.0
+celery==5.3.4
+
+# File handling
+Pillow==10.1.0
+aiofiles==23.2.1
+
+# External APIs
+plaid-python==9.0.0
+stripe==7.8.0
+requests==2.31.0
+httpx==0.25.2
+
+# Data validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+factory-boy==3.3.0
+
+# Security scanning
+safety==2.3.5
+bandit==1.7.5
+
+# Performance
+orjson==3.9.10
+ujson==5.8.0
+
+
+# Background tasks
+kombu==5.3.4
+
+# Configuration management
+python-dotenv==1.0.0
+
+# Logging
+colorama==0.4.6
+
+# Backup & Recovery
+boto3==1.34.0
+botocore==1.34.0
+
+# CORS
+fastapi-cors==0.0.6
+
+# Rate limiting
+slowapi==0.1.9
+
+# Timezone handling
+pytz==2023.3
+python-dateutil==2.8.2
+
+# Environment management
+python-decouple==3.8
+
+# API documentation
+fastapi-swagger-ui==0.1.0
+
+# Error tracking
+sentry-sdk[fastapi]==1.38.0
+
+# Background job processing
+rq==1.15.1
+
+# Cache warming
+cachetools==5.3.2
+
+# Data serialization
+marshmallow==3.20.1
+
+# HTTP client
+aiohttp==3.9.1
+
+# Task scheduling
+apscheduler==3.10.4
+
+# File upload handling
+python-multipart==0.0.6
+
+# Image processing
+Pillow==10.1.0
+
+# PDF generation
+reportlab==4.0.7
+
+# Excel handling
+openpyxl==3.1.2
+
+# CSV handling
+pandas==2.1.4
+
+# JSON handling
+orjson==3.9.10
+
+# XML handling
+lxml==4.9.3
+
+# YAML handling
+PyYAML==6.0.1
+
+# Configuration validation
+cerberus==1.3.5
+
+# Environment variable validation
+environs==10.0.0
+
+# Secret management
+keyring==24.3.0
+
+# User agent parsing
+user-agents==2.2.0
+
+# Regular expressions
+regex==2023.10.3
+
+# Number formatting
+num2words==0.5.12
+
+# Currency handling
+money==1.3.0
+
+# Date/time formatting
+arrow==1.3.0
+
+# Metrics collection
+prometheus-client==0.19.0
+
+# Cache warming
+cachetools==5.3.2
+
+# Data serialization
+marshmallow==3.20.1
+
+# HTTP client
+aiohttp==3.9.1
+
+# Task scheduling
+apscheduler==3.10.4
+
+# File upload handling
+python-multipart==0.0.6
+
+# Image processing
+Pillow==10.1.0
+
+# PDF generation
+reportlab==4.0.7
+
+# Excel handling
+openpyxl==3.1.2
+
+# CSV handling
+pandas==2.1.4
+
+# JSON handling
+orjson==3.9.10
+
+# XML handling
+lxml==4.9.3
+
+# YAML handling
+PyYAML==6.0.1
+
+# Configuration validation
+cerberus==1.3.5
+
+# Environment variable validation
+environs==10.0.0
+
+# Secret management
+keyring==24.3.0
+
+# User agent parsing
+user-agents==2.2.0
+
+# Regular expressions
+regex==2023.10.3
+
+# Number formatting
+num2words==0.5.12
+
+# Currency handling
+money==1.3.0
+
+# Date/time formatting
+arrow==1.3.0
