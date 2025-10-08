@@ -83,4 +83,3 @@ async def resume_donations_route(
 ):
     """Resume roundup donations"""
     return quick_toggle_roundups(current_user["id"], False, db)
-

@@ -148,32 +148,30 @@ def register(data: AuthRegisterRequest, db: Session):
         # Verify the commit worked by checking the database
         db.refresh(code_record)
         
-        # Verify the code was stored correctly
-        stored_code = db.query(AccessCode).filter(AccessCode.user_id == user.id).first()
-        if stored_code:
-            # Also check if we can find it by the exact access code
-            exact_match = db.query(AccessCode).filter(
-                AccessCode.user_id == user.id,
-                AccessCode.access_code == access_code
-            ).first()
-            
-        else:
-            # Check if there's a transaction issue
-            try:
-                db.rollback()
-                raise
-            except Exception as e:
-                # Try to commit again
-                db.add(code_record)
-                db.commit()
-                
-                # Check again
-                stored_code_retry = db.query(AccessCode).filter(AccessCode.user_id == user.id).first()
+        # Send verification code via email or SMS
+        if data.email:
+            send_email_with_sendgrid(
+                to_email=data.email,
+                subject="Verify your Manna account",
+                body_html=f"Your verification code is: {access_code}"
+            )
+        if data.phone:
+            send_otp_sms(data.phone, access_code)
+
+        return ResponseFactory.success(
+            message="Registration successful. Please verify your account.",
+            data={
+                "user_id": user.id,
+                "access_code": access_code,
+                "expires_at": expires_at.isoformat(),
+                "message": "Please check your email/phone for verification code"
+            }
+        )
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to confirm registration")
+        raise HTTPException(status_code=500, detail="Failed to register user")
 
 def register_code_resend(data: AuthRegisterCodeResendRequest, db: Session):
     """Resend registration access code"""

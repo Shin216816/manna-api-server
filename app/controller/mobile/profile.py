@@ -106,6 +106,15 @@ def update_mobile_profile(user_id: int, profile_data: Dict[str, Any], db: Sessio
             # Phone change requires verification
             user.phone = profile_data["phone"]
             user.is_phone_verified = False
+        
+        # Handle additional fields that may be sent by mobile app but not stored in User model
+        # These are ignored for now but could be stored in user preferences or metadata
+        additional_fields = ["bio", "timezone", "language", "currency"]
+        for field in additional_fields:
+            if field in profile_data:
+                # Log that these fields were received but not processed
+                # In a production system, these could be stored in a user_preferences table
+                pass
 
         user.updated_at = datetime.now(timezone.utc)
         db.commit()

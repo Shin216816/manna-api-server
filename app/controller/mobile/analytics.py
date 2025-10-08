@@ -19,6 +19,10 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional
 
 
+def get_mobile_user_analytics(user_id: int, db: Session):
+    """Get user analytics data for mobile app (alias for get_user_analytics)"""
+    return get_user_analytics(user_id, db)
+
 def get_user_analytics(user_id: int, db: Session):
     """Get user analytics data for mobile app"""
     try:
@@ -53,7 +57,7 @@ def get_user_analytics(user_id: int, db: Session):
         
         # Get roundup statistics
         preferences = db.query(DonationPreference).filter(DonationPreference.user_id == user_id).first()
-        roundup_enabled = preferences.is_active if preferences else False
+        roundup_enabled = not preferences.pause if preferences else False
         roundup_multiplier = preferences.multiplier if preferences else "1x"
         
         analytics_data = {

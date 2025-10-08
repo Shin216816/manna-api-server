@@ -6,7 +6,7 @@ Handles mobile app endpoints for:
 - Stripe payments
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from app.utils.database import get_db
 from app.middleware.auth_middleware import jwt_auth
@@ -159,6 +159,24 @@ async def resend_verification_route(
 ):
     """Resend verification code"""
     return register_code_resend(resend_data, db)
+
+@mobile_router.post("/auth/google", response_model=SuccessResponse)
+async def google_oauth_route(
+    data: dict,
+    db: Session = Depends(get_db)
+):
+    """Google OAuth login"""
+    from app.controller.mobile.auth import google_oauth_login
+    return google_oauth_login(data, db)
+
+@mobile_router.post("/auth/apple", response_model=SuccessResponse)
+async def apple_oauth_route(
+    data: dict,
+    db: Session = Depends(get_db)
+):
+    """Apple OAuth login"""
+    from app.controller.mobile.auth import apple_oauth_login
+    return apple_oauth_login(data, db)
 
 # Stripe Configuration Endpoint
 @mobile_router.get("/stripe/config", response_model=SuccessResponse)
@@ -348,6 +366,93 @@ async def get_current_user_route(
     # Return complete profile data (same as /profile endpoint)
     return get_mobile_profile(current_user["id"], db)
 
+@mobile_router.get("/profile", response_model=SuccessResponse)
+async def get_profile_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get user profile"""
+    return get_mobile_profile(current_user["id"], db)
+
+@mobile_router.put("/profile", response_model=SuccessResponse)
+async def update_profile_route(
+    profile_data: dict,
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Update user profile"""
+    return update_mobile_profile(current_user["id"], profile_data, db)
+
+@mobile_router.post("/profile/image", response_model=SuccessResponse)
+async def upload_profile_image_route(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Upload profile image"""
+    from app.controller.mobile.profile import upload_mobile_profile_image
+    return upload_mobile_profile_image(current_user["id"], file, db)
+
+@mobile_router.delete("/profile/image", response_model=SuccessResponse)
+async def delete_profile_image_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Delete profile image"""
+    from app.controller.mobile.profile import delete_mobile_profile_image
+    return delete_mobile_profile_image(current_user["id"], db)
+
+@mobile_router.get("/profile/image", response_model=SuccessResponse)
+async def get_profile_image_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get profile image URL"""
+    from app.controller.mobile.profile import get_mobile_profile_image
+    return get_mobile_profile_image(current_user["id"], db)
+
+# Additional profile endpoints expected by Flutter app
+@mobile_router.get("/auth/profile/stats", response_model=SuccessResponse)
+async def get_profile_stats_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get profile statistics"""
+    from app.controller.mobile.analytics import get_mobile_user_analytics
+    return get_mobile_user_analytics(current_user["id"], db)
+
+@mobile_router.get("/auth/profile/activity", response_model=SuccessResponse)
+async def get_profile_activity_route(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
+    start_date: str = Query(default=None),
+    end_date: str = Query(default=None),
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get profile activity history"""
+    from app.controller.mobile.donations import get_mobile_donation_history
+    return get_mobile_donation_history(current_user["id"], limit, db)
+
+@mobile_router.put("/auth/profile/preferences", response_model=SuccessResponse)
+async def update_profile_preferences_route(
+    preferences_data: dict,
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Update profile preferences"""
+    from app.controller.mobile.bank import update_bank_preferences
+    return update_bank_preferences(current_user["id"], preferences_data, db)
+
+@mobile_router.get("/auth/profile/preferences", response_model=SuccessResponse)
+async def get_profile_preferences_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get profile preferences"""
+    from app.controller.mobile.bank import get_bank_preferences
+    return get_bank_preferences(current_user["id"], db)
+
 # Bank Account Endpoints
 @mobile_router.post("/bank/link-token", response_model=SuccessResponse)
 async def create_link_token_route(
@@ -384,6 +489,19 @@ async def get_bank_transactions_route(
     """Get bank transactions"""
     return fetch_mobile_transactions(data, current_user, db)
 
+@mobile_router.get("/transactions", response_model=SuccessResponse)
+async def get_transactions_route(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
+    start_date: str = Query(default=None),
+    end_date: str = Query(default=None),
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get user transactions"""
+    from app.controller.mobile.bank import get_user_transactions
+    return get_user_transactions(current_user["id"], page, limit, start_date, end_date, db)
+
 @mobile_router.get("/bank/donation-history", response_model=SuccessResponse)
 async def get_bank_donation_history_route(
     current_user: dict = Depends(jwt_auth),
@@ -399,6 +517,15 @@ async def get_donation_summary_route(
 ):
     """Get donation summary"""
     return get_mobile_donation_summary(current_user, db)
+
+@mobile_router.get("/bank/calculate-roundups", response_model=SuccessResponse)
+async def calculate_roundups_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Calculate roundups for user"""
+    from app.controller.mobile.donations import calculate_roundups
+    return calculate_roundups(current_user["id"], db)
 
 @mobile_router.get("/bank/dashboard", response_model=SuccessResponse)
 async def get_bank_dashboard_route(
@@ -614,6 +741,16 @@ async def get_impact_summary_route(
 ):
     """Get impact summary"""
     return get_mobile_impact_summary(current_user["id"], db)
+
+# Analytics Endpoints
+@mobile_router.get("/analytics/user", response_model=SuccessResponse)
+async def get_user_analytics_route(
+    current_user: dict = Depends(jwt_auth),
+    db: Session = Depends(get_db)
+):
+    """Get user analytics data"""
+    from app.controller.mobile.analytics import get_mobile_user_analytics
+    return get_mobile_user_analytics(current_user["id"], db)
 
 # Dashboard Endpoints
 @mobile_router.get("/dashboard", response_model=SuccessResponse)

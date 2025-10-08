@@ -704,9 +704,10 @@ def fetch_mobile_transactions(data, current_user, db: Session):
         # Get all user's Plaid items
         plaid_items = db.query(PlaidItem).filter(PlaidItem.user_id == user_id).all()
         if not plaid_items:
-            raise HTTPException(
-                status_code=404, 
-                detail=get_bank_message("BANK_ACCOUNT_NOT_FOUND")
+            # Return empty transactions array instead of error for new users
+            return ResponseFactory.success(
+                message="No bank accounts linked yet",
+                data={"transactions": []}
             )
 
         # Calculate date range automatically
@@ -807,25 +808,45 @@ def get_bank_preferences(user_id: int, db: Session):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
+        # Get user's actual donation preferences
+        from app.model.m_donation_preference import DonationPreference
+        donation_prefs = db.query(DonationPreference).filter(DonationPreference.user_id == user_id).first()
+        
         # Get user's bank accounts from Plaid API
         from app.services.plaid_account_service import plaid_account_service
         accounts_result = plaid_account_service.get_user_accounts(user_id, db)
         plaid_accounts = accounts_result.get("accounts", []) if accounts_result["success"] else []
         
-        # Get basic preferences
-        preferences = {
-            "auto_roundup": True,  # Default to enabled
-            "roundup_threshold": 1.00,  # Default threshold
-            "max_monthly_donation": 100.00,  # Default max
-            "linked_accounts_count": len(plaid_accounts),
-            "last_sync_date": datetime.now().isoformat(),
-            "notifications_enabled": True,
-            "security_level": "standard"
-        }
+        # Build preferences response matching Flutter app expectations
+        if donation_prefs:
+            preferences = {
+                "frequency": donation_prefs.frequency,
+                "multiplier": donation_prefs.multiplier,
+                "church_id": donation_prefs.target_church_id,
+                "pause": donation_prefs.pause,
+                "cover_processing_fees": donation_prefs.cover_processing_fees,
+                "created_at": donation_prefs.created_at.isoformat() if donation_prefs.created_at else None,
+                "updated_at": donation_prefs.updated_at.isoformat() if donation_prefs.updated_at else None,
+                "linked_accounts_count": len(plaid_accounts),
+                "last_sync_date": datetime.now().isoformat(),
+            }
+        else:
+            # Return default preferences if none exist
+            preferences = {
+                "frequency": "biweekly",
+                "multiplier": "1x",
+                "church_id": None,
+                "pause": False,
+                "cover_processing_fees": False,
+                "created_at": None,
+                "updated_at": None,
+                "linked_accounts_count": len(plaid_accounts),
+                "last_sync_date": datetime.now().isoformat(),
+            }
         
         return ResponseFactory.success(
             message="Bank preferences retrieved successfully",
-            data={"preferences": preferences}
+            data=preferences  # Return preferences directly, not wrapped in "preferences" key
         )
     except HTTPException:
         raise

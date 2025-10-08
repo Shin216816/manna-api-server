@@ -205,3 +205,18 @@ class User(Base):
             })
             
         return data
+
+    @classmethod
+    def get_by_email(cls, db, email: str):
+        """Get user by email"""
+        return db.query(cls).filter(cls.email == email).first()
+
+    @classmethod
+    def get_by_phone(cls, db, phone: str):
+        """Get user by phone"""
+        return db.query(cls).filter(cls.phone == phone).first()
+
+    @classmethod
+    def get_by_id(cls, db, user_id: int):
+        """Get user by ID"""
+        return db.query(cls).filter(cls.id == user_id).first()
